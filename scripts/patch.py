@@ -54,6 +54,7 @@ def main():
     classes=a.work/'java';classes.mkdir()
     cp=os.pathsep.join(str(tools/n) for n in ['dexlib2.jar','guava.jar','apkeditor.jar'])
     run([javac,'-cp',cp,'-d',classes,ROOT/'patches/java/CloneFacebook.java',ROOT/'patches/java/VerifyCloneDex.java',ROOT/'patches/java/AddRestartManifest.java',ROOT/'patches/java/ValidateCompatibility.java'],'java-compile.log')
+    run([javac,'-cp',tools/'lspatch.jar','-d',classes,ROOT/'patches/java/CompactPatch.java'],'compact-compile.log')
     mapping_args=[profile[k] for k in ['playerClass','headerClass','headerModelField','lowResField','modelGetter','imageHelperClass','imageHelperMethod']]+[','.join(profile['coverPath'])]
     run([java,'-Xmx1200m','-cp',cp+os.pathsep+str(classes),'ValidateCompatibility',merged,*mapping_args],'compatibility-check.txt')
     helper=a.work/'helper';helper.mkdir();helper_dex=a.work/'helper-dex';helper_dex.mkdir()
@@ -89,6 +90,9 @@ def main():
             nums=[int(re.match(r'classes(\d*)\.dex',n)[1] or '1') for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)]
             for item in z.infolist():out.writestr(item,(v/'AndroidManifest.xml').read_bytes() if item.filename=='AndroidManifest.xml' else z.read(item.filename))
             out.write(helper_dex/'classes.dex','classes'+str(max(nums)+1)+'.dex',compress_type=zipfile.ZIP_STORED)
+        aligned_origin=v/'origin-aligned.apk'
+        run([bt/('zipalign'+exe),'-P','16','4',origin,aligned_origin],variant+'/origin-align.log')
+        origin=aligned_origin
         sign(origin,variant+'/origin-sign.log')
         module_tree=v/'module';shutil.copytree(ROOT/'module',module_tree,ignore=shutil.ignore_patterns('build','.gradle','local.properties'))
         (module_tree/'app/src/main/resources/META-INF/xposed/scope.list').write_text(target+'\n')
@@ -99,11 +103,13 @@ def main():
         unsigned=list((module_tree/'app/build/outputs/apk/release').glob('*-unsigned.apk'));assert len(unsigned)==1
         module=v/'module.apk';run([bt/('zipalign'+exe),'-P','16','4',unsigned[0],module],variant+'/module-align.log');sign(module,variant+'/module-sign.log')
         patched=v/'patched'
-        run([java,'-Xmx1536m','-jar',tools/'lspatch.jar','-m',module,'-k',a.keystore,password,a.alias,password,'-l','2','--injectdex','-o',patched,origin],variant+'/lspatch.log')
+        run([java,'-Xmx1536m','-cp',str(tools/'lspatch.jar')+os.pathsep+str(classes),'CompactPatch','-m',module,'-k',a.keystore,password,a.alias,password,'-l','2','--injectdex','-o',patched,origin],variant+'/lspatch.log')
         outputs=list(patched.glob('*.apk'));assert len(outputs)==1
         final=a.out/('Extended-'+version+'-'+variant+'.apk')
         if final.exists():raise RuntimeError('Output exists; choose a new --out')
-        run([bt/('zipalign'+exe),'-P','16','4',outputs[0],final],variant+'/align.log');sign(final,variant+'/sign.log')
+        # LSPatch has already signed the aligned, shared-entry archive. Rewriting
+        # it through zipalign/apksigner would duplicate the nested payload.
+        shutil.copy2(outputs[0],final)
         from verify import verify
         record=verify(final,origin,module,merged,target,bt,java,v)
         record.update(variant=variant,version=version,experimental_version=not tested,runtimeTested=False)

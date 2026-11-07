@@ -31,6 +31,10 @@ keytool -genkeypair -keystore /private/extended.p12 -storetype PKCS12 -alias ext
 | Clone | Change package, provider authorities, custom permissions and matching identity references; preserve Java class names and set the module's clone scope. |
 | Final build | Update DEX metadata, align, sign and verify payloads, signatures and clone conflicts. Original inputs stay unchanged. |
 
+**Compact packaging:** the internal Facebook APK is aligned before embedding; LSPatch writes shared ZIP entries with 16 KiB alignment and performs final signing. Do not rewrite the resulting APK with ZIP tools, zipalign or apksigner: doing so expands those shared entries into duplicate copies. The verifier checks the embedded origin's exact hash/CRC and each shared entry's original offset and metadata. This preserves features while avoiding the previous ~2× APK size.
+
+This reduces the download/APK size, not necessarily installed storage: the runtime still extracts its internal origin into app storage. Some generic ZIP readers flag intentional nested entries as overlapping; use the included verifier and Android signature/alignment tools rather than repacking the APK to “fix” it.
+
 The main edition uses `com.facebook.katana`; it cannot update vendor-signed Facebook. The clone uses `com.tas33n.facebook.extended` and can coexist with the main app. Exclude either embedded app from rooted Vector/LSPosed injection.
 
 ## When Facebook updates

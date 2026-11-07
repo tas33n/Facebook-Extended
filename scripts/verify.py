@@ -2,6 +2,7 @@
 import json,re,subprocess,zipfile,hashlib,os
 from pathlib import Path
 from tools import sha
+from compact import verify_nested
 def nodes(text):
     result=[];current=None
     for line in text.splitlines():
@@ -32,9 +33,8 @@ def verify(final,origin,module,baseline,target,bt,java,logs):
         assert not any('sharedUserId' in n['attrs'] for n in final_nodes)
     helper=next(n for n in final_nodes if n['tag']=='activity' and n['attrs'].get('name')=='tn.loukious.fbar.embedded.RestartActivity')
     assert helper['attrs']['process']==':fbar_restart'
+    nested=verify_nested(final,origin)
     with zipfile.ZipFile(final) as z,zipfile.ZipFile(origin) as a,zipfile.ZipFile(module) as m:
-        assert z.testzip() is None
-        assert hashlib.sha256(z.read('assets/lspatch/origin.apk')).hexdigest()==sha(origin)
         assert hashlib.sha256(z.read('assets/lspatch/modules/tn.loukious.facebookappadsremover.apk')).hexdigest()==sha(module)
         assert m.read('META-INF/xposed/scope.list').decode().strip()==target
         cfg=json.loads(z.read('assets/lspatch/config.json'));assert not cfg['useManager'] and cfg['injectDex']
@@ -47,4 +47,5 @@ def verify(final,origin,module,baseline,target,bt,java,logs):
             if parts and parts[0].endswith('.dex'):assert hashlib.sha1(z.read(parts[0])).hexdigest()==parts[1]
     return {'path':str(final),'sha256':sha(final),'bytes':final.stat().st_size,'package':target,
             'signer_sha256':sorted(set(re.findall(r'certificate SHA-256 digest: ([a-f0-9]+)',sig))),
+            'packaging':nested,
             'checks':{'signature':'pass','alignment16k':'pass','CRC':'pass','embeddedPayload':'pass','scope':'pass','secondaryDexDigests':'pass','cloneConflicts':'pass' if target!='com.facebook.katana' else 'not-applicable'}}

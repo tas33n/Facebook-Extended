@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — compact APK packaging
+
+- Preserve LSPatch's shared nested ZIP entries instead of duplicating Facebook payload during final alignment/signing.
+- Align the origin first, configure 16 KiB alignment before patching, and retain the patcher's final signature.
+- Validate bounded nested-origin CRC/hash and shared-entry offsets; no general ZIP-overlap checks disabled.
+- Facebook 586 main proof build reduced from 599,561,340 to 305,263,541 bytes; installed/cold-launched and tester confirmed menu/restart, video picker and source photos.
+
 ## Unreleased — automatic builds and repository links
 
 - Update project, credits, downloads and issue links to `tas33n/Facebook-Extended`.

@@ -90,7 +90,8 @@ public class CloneFacebook {
             }
         }
         manifest.setPackageName(NEW);
-        manifest.setApplicationLabel("Extended Clone");
+        // Preserve the application label resource for Facebook notification code.
+        // Branding belongs on launcher components, never an inline application label.
         // Launcher components may override the application label.
         for(var e:nodes) if(Set.of("activity","activity-alias").contains(e.getName())) {
             boolean launcher=false;

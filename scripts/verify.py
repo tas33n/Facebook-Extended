@@ -11,6 +11,19 @@ def nodes(text):
             m=re.search(r'A: (?:[^\s]+:)?([\w]+)(?:\([^)]*\))?="([^"]*)"',line)
             if m:current['attrs'][m[1]]=m[2]
     return result
+def application_label_resource(text):
+    """Read only the application's direct label, not a child Activity's label."""
+    lines=text.splitlines()
+    for index,line in enumerate(lines):
+        if re.search(r'\bE: application(?:\s|$)',line):
+            indent=len(line)-len(line.lstrip())
+            for child in lines[index+1:]:
+                if 'E: ' in child:break
+                if child.strip() and len(child)-len(child.lstrip())<=indent:break
+                match=re.search(r':label\([^)]*\)=@(0x[0-9a-fA-F]+)',child)
+                if match:return int(match[1],16)
+            return None
+    return None
 def verify(final,origin,module,baseline,target,bt,java,logs):
     exe='.exe' if os.name=='nt' else ''
     def run(args,name):
@@ -22,7 +35,12 @@ def verify(final,origin,module,baseline,target,bt,java,logs):
     badging=run([bt/('aapt2'+exe),'dump','badging',final],'badging.txt');assert "name='"+target+"'" in badging.splitlines()[0]
     text=run([bt/('aapt2'+exe),'dump','xmltree','--file','AndroidManifest.xml',final],'manifest.txt')
     for marker in ['requiredSplitTypes(', 'isSplitRequired(', 'E: uses-split','A: split=']:assert marker not in text,marker
-    original=nodes(run([bt/('aapt2'+exe),'dump','xmltree','--file','AndroidManifest.xml',baseline],'baseline-manifest.txt'))
+    baseline_text=run([bt/('aapt2'+exe),'dump','xmltree','--file','AndroidManifest.xml',baseline],'baseline-manifest.txt')
+    original=nodes(baseline_text)
+    original_label=application_label_resource(baseline_text)
+    assert original_label and application_label_resource(text)==original_label,'Application label resource changed/removed'
+    origin_text=run([bt/('aapt2'+exe),'dump','xmltree','--file','AndroidManifest.xml',origin],'origin-manifest.txt')
+    assert application_label_resource(origin_text)==original_label,'Nested origin application label resource changed/removed'
     final_nodes=nodes(text)
     def authorities(ns):return {a.strip() for n in ns if n['tag']=='provider' for a in n['attrs'].get('authorities','').split(';') if a.strip()}
     def permissions(ns):return {n['attrs']['name'] for n in ns if n['tag']=='permission'}
@@ -48,4 +66,4 @@ def verify(final,origin,module,baseline,target,bt,java,logs):
     return {'path':str(final),'sha256':sha(final),'bytes':final.stat().st_size,'package':target,
             'signer_sha256':sorted(set(re.findall(r'certificate SHA-256 digest: ([a-f0-9]+)',sig))),
             'packaging':nested,
-            'checks':{'signature':'pass','alignment16k':'pass','CRC':'pass','embeddedPayload':'pass','scope':'pass','secondaryDexDigests':'pass','cloneConflicts':'pass' if target!='com.facebook.katana' else 'not-applicable'}}
+            'checks':{'signature':'pass','alignment16k':'pass','CRC':'pass','embeddedPayload':'pass','scope':'pass','applicationLabelResource':'pass','secondaryDexDigests':'pass','cloneConflicts':'pass' if target!='com.facebook.katana' else 'not-applicable'}}

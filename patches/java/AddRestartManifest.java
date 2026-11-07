@@ -10,7 +10,11 @@ public class AddRestartManifest {
   a.getOrCreateAndroidAttribute("excludeFromRecents",0x01010017).setValueAsBoolean(true);
   a.getOrCreateAndroidAttribute("taskAffinity",0x01010012).setValueAsString(m.getPackageName()+".extended.restart");
   String label=m.getPackageName().equals("com.facebook.katana") ? "Facebook Extended" : "Extended Clone";
-  m.setApplicationLabel(label);
+  // Facebook notification code calls Resources.getString(ApplicationInfo.labelRes).
+  // Keep the original resource reference: an inline label makes labelRes zero.
+  var applicationLabel=m.getApplicationElement().searchAttributeByName("label");
+  if(applicationLabel==null || applicationLabel.getValueType()!=com.reandroid.arsc.value.ValueType.REFERENCE || applicationLabel.getData()==0)
+   throw new IllegalStateException("Application label must remain a nonzero resource reference");
   for(var entry:m.listActivities()) {
    var nodes=entry.recursiveElements();boolean launcher=false;
    while(nodes.hasNext()) {

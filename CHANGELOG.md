@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — incoming-message crash fix
+
+- Preserve Facebook's application label as a nonzero string-resource reference. Notification rendering calls getString(labelRes); an inline branded label made that ID zero and crashed the app on incoming messages.
+- Keep Facebook Extended / Extended Clone branding on launcher entries only.
+- Verify the original application label reference survives in both outer and nested-origin manifests; add regression tests.
+
 ## Unreleased — compact APK packaging
 
 - Preserve LSPatch's shared nested ZIP entries instead of duplicating Facebook payload during final alignment/signing.

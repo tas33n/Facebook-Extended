@@ -33,6 +33,8 @@ keytool -genkeypair -keystore /private/extended.p12 -storetype PKCS12 -alias ext
 
 **Compact packaging:** the internal Facebook APK is aligned before embedding; LSPatch writes shared ZIP entries with 16 KiB alignment and performs final signing. Do not rewrite the resulting APK with ZIP tools, zipalign or apksigner: doing so expands those shared entries into duplicate copies. The verifier checks the embedded origin's exact hash/CRC and each shared entry's original offset and metadata. This preserves features while avoiding the previous ~2× APK size.
 
+**App-label compatibility:** branding changes launcher labels only. Facebook's application label must remain its original nonzero string-resource reference; its notification code reads that resource directly. Both main and clone builds check this in the outer and internal-origin manifests to prevent incoming-message crashes.
+
 This reduces the download/APK size, not necessarily installed storage: the runtime still extracts its internal origin into app storage. Some generic ZIP readers flag intentional nested entries as overlapping; use the included verifier and Android signature/alignment tools rather than repacking the APK to “fix” it.
 
 The main edition uses `com.facebook.katana`; it cannot update vendor-signed Facebook. The clone uses `com.tas33n.facebook.extended` and can coexist with the main app. Exclude either embedded app from rooted Vector/LSPosed injection.

@@ -1,0 +1,9 @@
+{
+  "java_home": "C:/path/to/jdk-21",
+  "android_home": "C:/path/to/Android/Sdk",
+  "keystore": "C:/private/extended.p12",
+  "alias": "extended",
+  "work_root": "C:/extended-work",
+  "output_root": "C:/extended-output",
+  "variant": "both"
+}

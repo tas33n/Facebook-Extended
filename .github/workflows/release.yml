@@ -1,0 +1,32 @@
+name: Publish verified local artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing pushed tag (e.g. v1.0.0)
+        required: true
+      dist:
+        description: Absolute path to verified output directory on the release runner
+        required: true
+      notes:
+        description: Release notes path relative to repository
+        default: CHANGELOG.md
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: [self-hosted, extended-release]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify hashes and publish draft with GitHub CLI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_DIST: ${{ inputs.dist }}
+          RELEASE_NOTES: ${{ inputs.notes }}
+          GH_REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: python scripts/release.py --repo "$GH_REPOSITORY" --tag "$RELEASE_TAG" --dist "$RELEASE_DIST" --notes "$RELEASE_NOTES" --draft

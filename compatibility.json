@@ -1,0 +1,24 @@
+{
+  "585.0.0.47.54": {
+    "status": "device-tested-bounded",
+    "playerClass": "X.05gS",
+    "headerClass": "X.0Bub",
+    "headerModelField": "A05",
+    "lowResField": "A0D",
+    "modelGetter": "AGn",
+    "imageHelperClass": "X.088f",
+    "imageHelperMethod": "A00",
+    "coverPath": ["AXv", "CaC", "Az9", "Enc", "Az7", "AH1", "Dlk", "getUri"]
+  },
+  "586.0.0.52.53": {
+    "status": "device-tested-bounded",
+    "playerClass": "X.061Y",
+    "headerClass": "X.0CJE",
+    "headerModelField": "A05",
+    "lowResField": "A0D",
+    "modelGetter": "AH8",
+    "imageHelperClass": "X.08LA",
+    "imageHelperMethod": "A00",
+    "coverPath": ["AYb", "Cdg", "B0Q", "Euh", "B0O", "AHM", "Dql", "getUri"]
+  }
+}

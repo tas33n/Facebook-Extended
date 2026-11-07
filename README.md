@@ -26,7 +26,7 @@ Made by **[@tas33n](https://github.com/tas33n)**
 
 **Android 11+ · ARM64.** If prompted, allow installation from your browser or file manager.
 
-*Buttons always point to the latest automated release; they become available after the first successful publication.* [All releases](https://github.com/tas33n/Facebook-Extended/releases) · [VirusTotal reports](docs/SCANS.md)
+*Buttons always point to the latest automated release; they become available after the first successful publication.* [All releases](https://github.com/tas33n/Facebook-Extended/releases) · [VirusTotal reports](https://www.virustotal.com/gui/file/a25c3bb3d83f555eb35a2c6cebb67ac9aa85dbadde7d63d2e2b63ccbdf4b8bbf?nocache=1)
 
 ## ✨ Your Facebook, your way
 

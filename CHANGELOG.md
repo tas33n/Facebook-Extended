@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — automatic builds and repository links
+
+- Update project, credits, downloads and issue links to `tas33n/Facebook-Extended`.
+- Automatic main-branch builds/releases for changed root APK/APKS inputs; manual HTTPS URL + SHA-256 input for large files.
+- Hosted-runner SDK setup, persistent signing secrets, verified main/clone outputs and generated release notes.
+- Stable release asset names keep README download buttons independent of Facebook version.
+- Root inputs are no longer ignored; output APKs, local config and signing materials remain excluded.
+
 ## 1.1.0 — Facebook 586 support and drop-in updater
 
 - Root `patch.bat` / `patch.sh` / `python patch.py` with one-time ignored local configuration, deterministic input selection and unique work/output directories.

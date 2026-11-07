@@ -11,6 +11,10 @@ latest-build.json
 **/__pycache__/
 *.apk
 *.apks
+# Original root inputs may be committed intentionally to trigger GitHub builds.
+# Large Facebook files require Git LFS or the workflow's download-URL input.
+!/*.apk
+!/*.apks
 *.aab
 *.p12
 *.jks

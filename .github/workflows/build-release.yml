@@ -1,0 +1,103 @@
+name: Build and release Facebook Extended
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.apk'
+      - '*.apks'
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: 'Original APK/APKS filename already in repository root (choose this OR URL)'
+        required: false
+        type: string
+      input_url:
+        description: 'HTTPS download URL for an original APK/APKS (e.g. a public GitHub Release asset)'
+        required: false
+        type: string
+      input_sha256:
+        description: 'Exact SHA-256 of URL input (required with input_url)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: facebook-extended-publish
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    # Signing/release secrets are only used with the trusted main branch, never a PR.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    env:
+      CI_ROOT: ${{ runner.temp }}/extended-ci
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Select new or changed root inputs
+        id: inputs
+        env:
+          INPUT_FILE: ${{ inputs.input_file }}
+          INPUT_URL: ${{ inputs.input_url }}
+          INPUT_SHA256: ${{ inputs.input_sha256 }}
+        run: python scripts/ci_release.py select --root "$CI_ROOT"
+
+      - uses: actions/setup-java@v4
+        if: steps.inputs.outputs.has_inputs == 'true'
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+        if: steps.inputs.outputs.has_inputs == 'true'
+
+      - name: Install required Android SDK packages
+        if: steps.inputs.outputs.has_inputs == 'true'
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+
+      - name: Check pipeline tests
+        if: steps.inputs.outputs.has_inputs == 'true'
+        run: |
+          python -m compileall -q scripts patch.py
+          python -m unittest discover -s scripts/tests
+
+      - name: Restore signing key
+        if: steps.inputs.outputs.has_inputs == 'true'
+        env:
+          EXTENDED_KEYSTORE_BASE64: ${{ secrets.EXTENDED_KEYSTORE_BASE64 }}
+          EXTENDED_KEYSTORE_PASSWORD: ${{ secrets.EXTENDED_KEYSTORE_PASSWORD }}
+          EXTENDED_KEY_ALIAS: ${{ secrets.EXTENDED_KEY_ALIAS }}
+        run: python scripts/ci_release.py signing --root "$CI_ROOT"
+
+      - name: Patch, test and verify main and clone
+        if: steps.inputs.outputs.has_inputs == 'true'
+        env:
+          EXTENDED_KEYSTORE_PASSWORD: ${{ secrets.EXTENDED_KEYSTORE_PASSWORD }}
+          EXTENDED_KEY_ALIAS: ${{ secrets.EXTENDED_KEY_ALIAS }}
+        run: python scripts/ci_release.py build --root "$CI_ROOT"
+
+      - name: Publish APKs with generated release notes
+        if: steps.inputs.outputs.has_inputs == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/ci_release.py publish --root "$CI_ROOT"
+
+      - name: Remove temporary signing material
+        if: always()
+        run: python scripts/ci_release.py cleanup --root "$CI_ROOT"

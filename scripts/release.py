@@ -2,7 +2,7 @@
 import argparse,json,subprocess
 from pathlib import Path
 from tools import sha
-p=argparse.ArgumentParser();p.add_argument('--repo',default='tas33n/Extended');p.add_argument('--tag',required=True);p.add_argument('--dist',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--draft',action='store_true');p.add_argument('--dry-run',action='store_true')
+p=argparse.ArgumentParser();p.add_argument('--repo',default='tas33n/Facebook-Extended');p.add_argument('--tag',required=True);p.add_argument('--dist',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--draft',action='store_true');p.add_argument('--dry-run',action='store_true')
 a=p.parse_args();report=json.loads((a.dist/'verification.json').read_text());assets=[]
 for build in report['builds']:
     f=a.dist/build['path'].replace('\\','/').rsplit('/',1)[-1]

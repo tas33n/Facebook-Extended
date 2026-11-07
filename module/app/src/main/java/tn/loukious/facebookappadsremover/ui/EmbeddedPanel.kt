@@ -177,7 +177,7 @@ object EmbeddedPanel : Application.ActivityLifecycleCallbacks {
         footer.addView(done, LinearLayout.LayoutParams(0, dp(context, 48), 1f))
         shell.addView(footer)
         val credits = TextView(context).apply {
-            text = "Developed by @tas33n\ntas33n/Extended · Built on Loukious’s FBAR"
+            text = "Developed by @tas33n\ntas33n/Facebook-Extended · Built on Loukious’s FBAR"
             textSize = 11f; gravity = Gravity.CENTER; setTextColor(secondary)
             setPadding(0, dp(context, 12), 0, dp(context, 2))
             contentDescription = "Extended credits and GitHub links"
@@ -185,7 +185,7 @@ object EmbeddedPanel : Application.ActivityLifecycleCallbacks {
                 AlertDialog.Builder(context).setTitle("Credits").setItems(arrayOf(
                     "@tas33n — Extended", "Loukious — Facebook App Ads Remover", "JingMatrix — LSPatch / Vector"
                 )) { _, index ->
-                    val urls = arrayOf("https://github.com/tas33n/Extended",
+                    val urls = arrayOf("https://github.com/tas33n/Facebook-Extended",
                         "https://github.com/Xposed-Modules-Repo/tn.loukious.facebookappadsremover",
                         "https://github.com/JingMatrix/LSPatch")
                     runCatching { activity.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(urls[index]))) }

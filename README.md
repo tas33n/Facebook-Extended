@@ -8,11 +8,25 @@ Customize your feed, filter ads, download media and make Facebook feel like your
 
 **No root · In-app settings · Main & side-by-side clone**
 
-[Releases](https://github.com/tas33n/Extended/releases) · [Changelog](CHANGELOG.md) · [Patching guide](docs/PATCHING.md)
+[Releases](https://github.com/tas33n/Facebook-Extended/releases) · [Changelog](CHANGELOG.md) · [Patching guide](docs/PATCHING.md)
 
 Made by **[@tas33n](https://github.com/tas33n)**
 
 </div>
+
+## 📥 Download & install
+
+**No Git or build tools needed.** Tap a button on your Android phone, download the APK, then open it to install.
+
+[![Download Main App](https://img.shields.io/badge/Download-Main_App-0866FF?style=for-the-badge&logo=android&logoColor=white)](https://github.com/tas33n/Facebook-Extended/releases/latest/download/Facebook-Extended-main.apk)
+[![Download Clone App](https://img.shields.io/badge/Download-Clone_App-238636?style=for-the-badge&logo=android&logoColor=white)](https://github.com/tas33n/Facebook-Extended/releases/latest/download/Facebook-Extended-clone.apk)
+
+- **Main app:** use Facebook Extended as your main app; cannot install over stock Facebook.
+- **Clone app:** keep your existing Facebook and install Extended alongside it.
+
+**Android 11+ · ARM64.** If prompted, allow installation from your browser or file manager.
+
+*Buttons always point to the latest automated release; they become available after the first successful publication.* [All releases](https://github.com/tas33n/Facebook-Extended/releases) · [VirusTotal reports](docs/SCANS.md)
 
 ## ✨ Your Facebook, your way
 
@@ -49,8 +63,6 @@ No persistent floating button. No separate module app needed. Settings save imme
 **Android 11+ · ARM64 · Single APK installation**  
 Reviewed Facebook versions: **585.0.0.47.54** and **586.0.0.52.53**.
 
-**[Get releases →](https://github.com/tas33n/Extended/releases)** · Public release publication is pending. [VirusTotal reports →](docs/SCANS.md) *(scan links pending)*
-
 ### Already have root?
 
 We recommend **[Loukious’s original Facebook App Ads Remover](https://github.com/Xposed-Modules-Repo/tn.loukious.facebookappadsremover)** with **[Vector](https://github.com/JingMatrix/Vector)** / compatible LSPosed and stock Facebook. You can use the embedded build too—just exclude it from rooted framework injection to avoid running both runtimes together.
@@ -66,6 +78,14 @@ Place an original Facebook **APK/APKS** in this folder and run:
 Or use `python patch.py`. First-run setup remembers your local tool and signing-key paths. Both editions are built by default; completed outputs are listed in `latest-build.json`.
 
 [Patching, updates & releases →](docs/PATCHING.md)
+
+**Build on GitHub:** after the one-time signing-secret setup, pushing a root APK/APKS triggers builds and a release of both editions. For large files, use **Actions → Build and release Facebook Extended → Run workflow** with a download URL and SHA-256. [Setup →](docs/PATCHING.md#automatic-github-builds)
+
+## 💬 Bugs & feature requests
+
+Found a problem or have an idea? **[Report a bug](https://github.com/tas33n/Facebook-Extended/issues/new?title=Bug%3A%20)** or **[request a feature](https://github.com/tas33n/Facebook-Extended/issues/new?title=Feature%20request%3A%20)** in GitHub Issues.
+
+For bugs, include your Android version, Facebook Extended version, main/clone edition and steps to reproduce. Screenshots help—hide personal information first.
 
 ## ❤️ Credits
 
